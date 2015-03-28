@@ -13,15 +13,6 @@ TARGETS = tmpsnread
 
 
 ##
-# Define compiler here. Options so far are gcc, clang
-#
-COMPILER = gcc
-#COMPILER = clang
-
-
-
-
-##
 # Define global flags here.
 #
 STD_FLAGS = -O0 -Wall -std=gnu99
@@ -43,11 +34,21 @@ LIBSENSORS = -lsensors
 
 
 ##
+# Set default compiler if none set.
+#
+ifeq ($(CC), gcc)
+else ifeq ($(CC), clang)
+else
+	CC = gcc
+endif
+
+
+##
 # Print some help information.
 #
 .ONESHELL:
 help:
-	@echo -e "Usage: LANG=<LANGUAGE> RELEASE=<true> make [option]\n"
+	@echo -e "Usage: LANG=<LANGUAGE> RELEASE=<true> CC=<compiler> make [option]\n"
 	@echo -e "Supported options:"
 	@echo -e "\thelp\t\t\tPrint this help list"
 	@echo -e "\tall\t\t\tMake all executables"
@@ -58,7 +59,8 @@ help:
 	@echo -e "\t\t\t\tand .pot files"
 	@echo -e "\ttmpsnread\t\tMake tmpsnread executable"
 	@echo -e "\ttmpsnread.po\t\tPrepare tmpsnread.po file for translation"
-	@echo -e "\ttmpsnread.mo\t\tMake tmpsnread.mo translation\n"
+	@echo -e "\ttmpsnread.mo\t\tMake tmpsnread.mo translation\n\n"
+	@echo -e "Supported compilers: gcc, clang.\n\n"
 	@echo -e "Report bugs and suggestions to <$(BUG_ADDRESS)>\n"
 
 
@@ -93,13 +95,13 @@ tmpsnread : OBJS = $(TARGET).o
 tmpsnread : LIBS = $(LIBSENSORS) $(LIBGLIB2)
 tmpsnread : EXTRA_FLAGS = $(GLIB2CFLAGS)
 tmpsnread : tmpsnread.o
-	$(COMPILER) -o $(TARGET) $(OBJS) $(LIBS)
+	$(CC) -o $(TARGET) $(OBJS) $(LIBS)
 
 tmpsnread.o : tmpsnread.c
 ifeq ($(RELEASE), true)
-	$(COMPILER) $(STD_FLAGS) $(EXTRA_FLAGS) -c $(SOURCES)
+	$(CC) $(STD_FLAGS) $(EXTRA_FLAGS) -c $(SOURCES)
 else
-	$(COMPILER) $(STD_DBG_FLAGS) $(EXTRA_FLAGS) -c $(SOURCES)
+	$(CC) $(STD_DBG_FLAGS) $(EXTRA_FLAGS) -c $(SOURCES)
 endif
 
 # tmpsnread localisation section.
